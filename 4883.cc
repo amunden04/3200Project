@@ -8,15 +8,8 @@
 
 using namespace std;
 
-int calcPeople(int r, int p){
-  int numPeople = 0;
-  while(r >= 0){
-    r = r - p;
-    numPeople++;
-  }
-  return numPeople;
-}
-
+// Function that returns true or false depending on whether or not the
+// Rope is long enough for the entire climb
 bool longEnough(int r, int p){
   if(r >= 2 * p){
       return true;
@@ -28,35 +21,49 @@ bool longEnough(int r, int p){
 int main(){
   int n;
 
+  // Loop through the cases until 0 is input
   while (cin >> n && n != 0){
+    // Create a vector of pitches
     vector<int> pitches;
-    int temp;
+    int temp, maxPeople, pitch;
     int total = 0;
-    int maxPeople;
-    int pitch;
+
+    // Get the pitch input and put it into the vector
+    // Keep a running total of the distance of the pitches
     for(int i = 0; i < n; i++){
       cin >> temp;
       pitches.push_back(temp);
       total += pitches[i];
     }
+    // Sort the pitches
     sort(pitches.begin(), pitches.end());
+    // Make pitch equal to the longest pitch
     pitch = pitches[n-1];
 
-    maxPeople = calcPeople(50, pitch);
+    // Calculate the maxPeople that could climb with a 50m rope
+    maxPeople = (50/pitch) + 1;
+    // If the rope is long enough for the total climb and more than one
+    // person can climb output the maxPeople otherwise output 0
     if(longEnough(50, total) && maxPeople > 1){
       cout << maxPeople << " ";
     } else {
       cout << 0 << " ";
     }
 
-    maxPeople = calcPeople(60, pitch);
-    if(longEnough(60, total && maxPeople > 1)){
+    // Calculate the maxPeople that could climb with a 60m rope
+    maxPeople = (60/pitch) + 1;
+    // If the rope is long enough for the total climb and more than one
+    // person can climb output the maxPeople otherwise output 0
+    if(longEnough(60, total) && maxPeople > 1){
       cout << maxPeople << " ";
     } else {
       cout << 0 << " ";
     }
 
-    maxPeople = calcPeople(70, pitch);
+    // Calculate the maxPeople that could climb with a 70m rope
+    maxPeople = (70/pitch) + 1;
+    // If the rope is long enough for the total climb and more than one
+    // person can climb output the maxPeople otherwise output 0
     if(longEnough(70, total) && maxPeople > 1){
       cout << maxPeople << endl;
     } else {
