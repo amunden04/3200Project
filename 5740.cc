@@ -211,51 +211,132 @@ ostream& operator<< (ostream &os, const Date &d) {
   return os;
 }
 
+// Start of my code
+// Function to remove all the '/' characters from a string and replace them with spaces
 string removeSlashes(string s){
   string clean;
+  // Go through each character in the string and if it is '/' replace it with ' '
   for(int i = 0; i <= s.length()-1; i++){
     if(s[i] == '/'){
       s[i] = ' ';
     }
     clean += s[i];
   }
+  // Return the string without the '/'
   return clean;
 }
 
 int main(){
-  Date live, apply;
+  // Create two dates: the date you start living in Canada and the date you can apply
+  Date live, apply, cstart;
+  // Create two strings to get the input dates: first one for when you start living in Canada
+  // and the second one for when you get permanent resident status
   string living, prStatus;
   int month1=0, day1=0, year1=0;
   int month2=0, day2=0, year2=0;
-  getline(cin, living);
-  living = removeSlashes(living);
-  istringstream iss(living);
-  iss >> month1;
-  iss >> day1;
-  iss >> year1;
+  // Loop through all cases
+  while(!getline(cin, living).eof()){
+    living = removeSlashes(living);
+    istringstream iss(living);
+    iss >> month1;
+    iss >> day1;
+    iss >> year1;
+    // Add the first date input to the live date
+    live.mm = month1;
+    live.dd = day1;
+    live.yyyy = year1;
 
-  live.mm = month1;
-  live.dd = day1;
-  live.yyyy = year1;
+    getline(cin, prStatus);
+    prStatus = removeSlashes(prStatus);
+    istringstream is(prStatus);
+    is >> month2 >> day2 >> year2;
+    // Add the second date input to the apply date
+    apply.mm = month2;
+    apply.dd = day2;
+    apply.yyyy = year2;
 
-  getline(cin, prStatus);
-  prStatus = removeSlashes(prStatus);
-  istringstream is(prStatus);
-  is >> month2 >> day2 >> year2;
-  apply.mm = month2;
-  apply.dd = day2;
-  apply.yyyy = year2;
+    cstart.mm = month2;
+    cstart.dd = day2;
+    cstart.yyyy = year2;
 
-  int daysBetween, credit;
-  daysBetween = apply.daysFromStart(month1, day1, year1);
-  cout << daysBetween << endl;
-  credit = floor(daysBetween/2);
-  cout << credit << endl;
-  apply.addDay(1095);
-  apply.addDay(-credit);
+    cstart.addDay(-731);
+    // create two variables: dayBetween and credit
+    // The daysBetween will be the number of days between getting to Canada and
+    // being granted permanent resident status and the credit will be how much to subtract
+    int daysBetween, credit;
+    // Calculate the daysBetween
+    daysBetween = apply.daysFromStart(month1, day1, year1);
 
-  cout << "apply date" << " " << apply.mm << '/' << apply.dd;
-  cout << '/' << apply.yyyy << endl;
+    // Get the number of times they travelled out of the country
+    string n;
+    int t;
+    getline(cin, n);
+    t = stoi(n);
+
+    int addTime = 0;
+    // Loop through each of the times travelled out of the country
+    for(int i = 0; i < t; i++){
+      // Create two dates: one for the start of travel and one for the end of travel
+      Date start, end;
+      string info;
+      int month, day, year;
+      getline(cin, info);
+      info = removeSlashes(info);
+      istringstream in(info);
+      in >> month >> day >> year;
+      // Put the first date into the start date
+      start.mm = month;
+      start.dd = day;
+      start.yyyy = year;
+      in >> month >> day >> year;
+      // Put the second date into the end date
+      end.mm = month;
+      end.dd = day;
+      end.yyyy = year;
+      if(daysBetween > 731){
+        // If the "apply" date which is currently the date you get permanent resident status
+        // is before the end of the travel period then add the time gone as full days
+        if(cstart < end){
+        addTime += end.daysFromStart(start.mm, start.dd, start.yyyy);
+        // Otherwise, add the time gone as half days
+        } else {
+          addTime += floor(end.daysFromStart(start.mm, start.dd, start.yyyy)/2);
+        }
+      } else {
+      // If the "apply" date which is currently the date you get permanent resident status
+      // is before the end of the travel period then add the time gone as full days
+      if(apply < end){
+      addTime += end.daysFromStart(start.mm, start.dd, start.yyyy);
+      // Otherwise, add the time gone as half days
+      } else {
+        addTime += floor(end.daysFromStart(start.mm, start.dd, start.yyyy)/2);
+      }
+    }
+    }
+
+    // If daysBetween is less than or equal to one or greater than or equal to 730
+    // Then you add 1095 days to the date of gaining permanent resident status and subtract
+    // the credit
+    if(daysBetween <= 1 || daysBetween >= 730){
+      if(daysBetween > 731){
+        credit = floor(731/2);
+      } else {
+    credit = floor(daysBetween/2);
+    }
+    apply.addDay(1095);
+    apply.addDay(-credit);
+    // Otherwise, you add 1096 days to the date of gaining permanent resident status and
+    // subtract the credit
+  } else {
+    credit = floor(daysBetween/2);
+    apply.addDay(1096);
+    apply.addDay(-credit);
+  }
+    // Add on the days of travel time that was previously calculated
+    apply.addDay(addTime);
+    // Output the date you can apply
+    cout << apply.mm << '/' << apply.dd << '/' << apply.yyyy << endl;
+  }
 
   return 0;
 }
