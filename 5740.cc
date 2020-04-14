@@ -227,7 +227,8 @@ string removeSlashes(string s){
 }
 
 int main(){
-  // Create two dates: the date you start living in Canada and the date you can apply
+  // Create three dates: the date you start living in Canada, the date you can apply,
+  // and the date you can start receiving credit for your time in Canada
   Date live, apply, cstart;
   // Create two strings to get the input dates: first one for when you start living in Canada
   // and the second one for when you get permanent resident status
@@ -255,10 +256,11 @@ int main(){
     apply.dd = day2;
     apply.yyyy = year2;
 
+    // Also put the second date information into the cstart date
     cstart.mm = month2;
     cstart.dd = day2;
     cstart.yyyy = year2;
-
+    // Subtract 731 to get the date and which you can start getting credit
     cstart.addDay(-731);
     // create two variables: dayBetween and credit
     // The daysBetween will be the number of days between getting to Canada and
@@ -293,8 +295,10 @@ int main(){
       end.mm = month;
       end.dd = day;
       end.yyyy = year;
+      // If the days between the two dates is greater than 731 then use the cstart date
+      // for comparison
       if(daysBetween > 731){
-        // If the "apply" date which is currently the date you get permanent resident status
+        // If the "cstart" date which is currently the date you get permanent resident status
         // is before the end of the travel period then add the time gone as full days
         if(cstart < end){
         addTime += end.daysFromStart(start.mm, start.dd, start.yyyy);
@@ -302,6 +306,7 @@ int main(){
         } else {
           addTime += floor(end.daysFromStart(start.mm, start.dd, start.yyyy)/2);
         }
+        // Otherwise, use the apply date for comparison
       } else {
       // If the "apply" date which is currently the date you get permanent resident status
       // is before the end of the travel period then add the time gone as full days
@@ -318,8 +323,11 @@ int main(){
     // Then you add 1095 days to the date of gaining permanent resident status and subtract
     // the credit
     if(daysBetween <= 1 || daysBetween >= 730){
+      // If the daysBetween the two dates is greater than 731 then you only get
+      // the credit for the 730 days
       if(daysBetween > 731){
         credit = floor(731/2);
+        // otherwise, calculate the credit based on how many days are between the two dates
       } else {
     credit = floor(daysBetween/2);
     }
